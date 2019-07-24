@@ -1,82 +1,119 @@
 import math
 import random
 import numpy as np
-import matplotlib.pyplot as plt
 
 class vec2:
+    "Represent vector of two elements."
     def __init__(self, x, y):
+        "Initialize self."
         self.x = x
         self.y = y
     def __add__(self, other):
+        "Add two vectors."
         return vec2(self.x + other.x, self.y + other.y)
     def __sub__(self, other):
+        "Subtract two vectors."
         return vec2(self.x - other.x, self.y - other.y)
     def __mul__(self, k):
+        "Multiply vector by scalar value."
         return vec2(self.x*k, self.y*k)
     def __rmul__(self, k):
-        return vec2(self.x*k, self.y*k)
+        "Multiply vector by scalar value."
+        return vec2(k*self.x, k*self.y)
     def __truediv__(self, k):
+        "Divide vector by scalar value."
         return vec2(self.x/k, self.y/k)
     def __repr__(self):
+        "Represent vector as string."
         return "(" + str(self.x) + ", " + str(self.y) + ")"
     def scale(self, k_x, k_y = None):
+        """Scale vector. If only one argument is given, both elements are multiplied by the
+        same value. If two arguments are given, each element is multiplied by the corresponding
+        argument.
+        """
         if (k_y is None):
             return vec2(k_x*self.x, k_x*self.y)
         else:
             return vec2(k_x*self.x, k_y*self.y)
     def translate(self, tr_x, tr_y):
+        "Translate vector. Each argument is added to the corresponding element in the vector."
         return vec2(self.x + tr_x, self.y + tr_y)
     def rotate(self, th):
+        "Rotate vector around the origin. The given angle is in radians."
         return vec2(self.x*math.cos(th) - self.y*math.sin(th), self.x*math.sin(th) + self.y*math.cos(th))
     def dot(self, other):
+        "Compute the dot product of two vectors."
         return self.x*other.x + self.y*other.y
     def transpose_multiply(self, other):
+        "Multiply column vector by row vector."
         return mat2([self.x*other.x, self.x*other.y, self.y*other.x, self.y*other.y])
     def str_repr(self, ndigits):
+        "Represents vector as string given the number of digits to round each element."
         return "(" + str(round(self.x, ndigits)) + ", " + str(round(self.y, ndigits)) + ")"
 
 class vec3:
+    "Represent vector of three elements."
     def __init__(self, x, y, z):
+        "Initialize vector."
         self.x = x
         self.y = y
         self.z = z
     def __add__(self, other):
+        "Add two vectors."
         return vec3(self.x + other.x, self.y + other.y, self.z + other.z)
     def __sub__(self, other):
+        "Subtract two vectors."
         return vec3(self.x - other.x, self.y - other.y, self.z - other.z)
     def __mul__(self, k):
+        "Multiply vector by scalar value."
         return vec3(self.x*k, self.y*k, self.z*k)
     def __rmul__(self, k):
-        return vec3(self.x*k, self.y*k, self.z*k)
+        "Multiply vector by scalar value."
+        return vec3(k*self.x, k*self.y, k*self.z)
     def __truediv__(self, k):
+        "Divide vector by scalar value."
         return vec3(self.x/k, self.y/k, self.z/k)
     def __repr__(self):
+        "Represent vector as string."
         return "(" + str(self.x) + ", " + str(self.y) + ", " + str(self.z) + ")"
     def scale(self, k_x, k_y = None, k_z = None):
+        """Scale vector. If only one argument is given, all elements are multiplied by the same
+        value. If three arguments are given, each element is multiplied by the corresponding
+        argument.
+        """
         if (k_y is None):
             return vec3(k_x*self.x, k_x*self.y, k_x*self.z)
         else:
             return vec3(k_x*self.x, k_y*self.y, k_z*self.z)
     def translate(self, tr_x, tr_y, tr_z):
+        "Translate vector. Each argument is added to the corresponding element in the vector."
         return vec3(self.x + tr_x, self.y + tr_y, self.z + tr_z)
     def rotate_x(self, th_x):
+        "Rotate vector along the x-axis. The given angle is in radians."
         return vec3(self.x, self.y*math.cos(th_x) - self.z*math.sin(th_x), self.y*math.sin(th_x) + self.z*math.cos(th_x))
     def rotate_y(self, th_y):
+        "Rotate vector along the y-axis. The given angle is in radians."
         return vec3(self.z*math.sin(th_y) + self.x*math.cos(th_y), self.y, self.z*math.cos(th_y) - self.x*math.sin(th_y))
     def rotate_z(self, th_z):
+        "Rotate vector along the z-axis. The given angle is in radians."
         return vec3(self.x*math.cos(th_z) - self.y*math.sin(th_z), self.x*math.sin(th_z) + self.y*math.cos(th_z), self.z)
     def dot(self, other):
+        "Compute the dot product of two vectors."
         return self.x*other.x + self.y*other.y + self.z*other.z
     def transpose_multiply(self, other):
+        "Multiply column vector by row vector."
         value = [self.x*other.x, self.x*other.y, self.x*other.z,
         self.y*other.x, self.y*other.y, self.y*other.z,
         self.z*other.x, self.z*other.y, self.z*other.z]
         return mat3(value)
     def str_repr(self, ndigits):
+        "Represents vector as string given the number of digits to round each element."
         return "(" + str(round(self.x, ndigits)) + ", " + str(round(self.y, ndigits)) + ", " + str(round(self.z, ndigits)) + ")"
 
 class mat2:
+    "Represent two-by-two matrix."
     def __init__(self, value = None):
+        "Initialize matrix."
         if (value != None):
             if (isinstance(value, float)):
                 self.matrix = [value, 0.0, 0.0, value]
@@ -87,12 +124,16 @@ class mat2:
         else:
             self.matrix = [0.0, 0.0, 0.0, 0.0]
     def __getitem__(self, index):
+        "Get item in matrix."
         return self.matrix[index]
     def __add__(self, other):
+        "Add two matrices."
         return mat2([self[0] + other[0], self[1] + other[1], self[2] + other[2], self[3] + other[3]])
     def __sub__(self, other):
+        "Subtract two matrices."
         return mat2([self[0] - other[0], self[1] - other[1], self[2] - other[2], self[3] - other[3]])
     def __mul__(self, other):
+        "Multiply matrix by a scalar value, vector, or another matrix."
         if (isinstance(other, float) or isinstance(other, int)):
             return mat2([self[0]*other, self[1]*other, self[2]*other, self[3]*other])
         if (isinstance(other, mat2)):
@@ -100,21 +141,29 @@ class mat2:
         if (isinstance(other, vec2)):
             return vec2(self[0]*other.x + self[1]*other.y, self[2]*other.x + self[3]*other.y)
     def __rmul__(self, k):
+        "Multiply matrix by scalar value."
         return mat2([self[0]*k, self[1]*k, self[2]*k, self[3]*k])
     def __truediv__(self, k):
+        "Divide matrix by scalar value."
         return mat2([self[0]/k, self[1]/k, self[2]/k, self[3]/k])
     def __repr__(self):
+        "Represent matrix as string."
         return "[" + str(self[0]) + ", " + str(self[1]) + "; " + str(self[2]) + ", " + str(self[3]) + "]"
     def det(self):
+        "Compute determinant of matrix."
         return self[0]*self[3] - self[1]*self[2]
     def inverse(self):
+        "Compute inverse of matrix."
         det = self.det()
         return mat2([self[3]/det, -self[1]/det, -self[2]/det, self[0]/det])
     def transpose(self):
+        "Transpose matrix."
         return mat2([self[0], self[2], self[1], self[3]])
 
 class mat3:
+    "Represent three-by-three matrix."
     def __init__(self, value = None):
+        "Initialize matrix."
         if (value != None):
             if (isinstance(value, float)):
                 self.matrix = [value, 0.0, 0.0, 0.0, value, 0.0, 0.0, 0.0, value]
@@ -125,14 +174,18 @@ class mat3:
         else:
             self.matrix = [0.0 for i in range(9)]
     def __getitem__(self, index):
+        "Get item in matrix."
         return self.matrix[index]
     def __add__(self, other):
+        "Add two matrices."
         value = [self[i] + other[i] for i in range(9)]
         return mat3(value)
     def __sub__(self, other):
+        "Subtract two matrices."
         value = [self[i] - other[i] for i in range(9)]
         return mat3(value)
     def __mul__(self, other):
+        "Multiply matrix by a scalar value, vector, or another matrix."
         if (isinstance(other, float) or isinstance(other, int)):
             value = [self[i]*other for i in range(9)]
             return mat3(value)
@@ -143,28 +196,51 @@ class mat3:
             value = [self[i]*other.x + self[i + 1]*other.y + self[i + 2]*other.z for i in range(0, 9, 3)]
             return vec3(*value)
     def __rmul__(self, k):
+        "Multiply matrix by scalar value."
         value = [self[i]*k for i in range(9)]
         return mat3(value)
     def __truediv__(self, k):
+        "Divide matrix by scalar value."
         value = [self[i]/k for i in range(9)]
         return mat3(value)
     def __repr__(self):
+        "Represent matrix as string."
         return "[" + str(self[0]) + ", " + str(self[1]) + ", " + str(self[2]) + "; " + \
         str(self[3]) + ", " + str(self[4]) + ", " + str(self[5]) + "; " + \
         str(self[6]) + ", " + str(self[7]) + ", " + str(self[8]) + "]"
     def det(self):
+        "Compute determinant of matrix."
         return self[0]*(self[4]*self[8] - self[5]*self[7]) - self[1]*(self[3]*self[8] - self[5]*self[6]) + self[2]*(self[3]*self[7] - self[4]*self[6])
     def inverse(self):
+        "Compute inverse of matrix."
         det = self.det()
         value = [(self[4]*self[8] - self[5]*self[7])/det, (self[2]*self[7] - self[1]*self[8])/det, (self[1]*self[5] - self[2]*self[4])/det,
         (self[5]*self[6] - self[3]*self[8])/det, (self[0]*self[8] - self[2]*self[6])/det, (self[2]*self[3] - self[0]*self[5])/det,
         (self[3]*self[7] - self[4]*self[6])/det, (self[1]*self[6] - self[0]*self[7])/det, (self[0]*self[4] - self[1]*self[3])/det]
         return mat3(value)
     def transpose(self):
+        "Transpose matrix."
         value = [self[0], self[3], self[6], self[1], self[4], self[7], self[2], self[5], self[8]]
         return mat3(value)
 
 def affine_transform_2d(v, mapping, alpha = 1):
+    """Maps a point on the undeformed image to a point on the deformed image given a set of
+    points mapping points on the deformed image to points on the undeformed image using
+    affine transformation. Used on two-dimensional images.
+    
+    Parameters
+    ----------
+    v: vector
+        A point on the undeformed image represented by a two-dimensional vector.
+    
+    mapping: list of tuples of vectors
+        A list of tuples containing a pair of vectors that represent points on the
+        undeformed image mapping to points on the deformed image.
+    
+    alpha: float, optional
+        Can affect where a point maps exactly on the deformed image and is set to 1 by
+        default if it is not specified.
+    """
     p_wgt = vec2(0, 0)
     q_wgt = vec2(0, 0)
     w = len(mapping)*[None]
@@ -195,6 +271,23 @@ def affine_transform_2d(v, mapping, alpha = 1):
     return v_out
 
 def affine_transform_3d(v, mapping, alpha = 1):
+    """Maps a point on the undeformed image to a point on the deformed image given a set of
+    points mapping points on the deformed image to points on the undeformed image using
+    affine transformation. Used on three-dimensional images.
+    
+    Parameters
+    ----------
+    v: vector
+        A point on the undeformed image represented by a three-dimensional vector.
+    
+    mapping: list of tuples of vectors
+        A list of tuples containing a pair of vectors that represent points on the
+        undeformed image mapping to points on the deformed image.
+    
+    alpha: float, optional
+        Can affect where a point maps exactly on the deformed image and is set to 1 by
+        default if it is not specified.
+    """
     p_wgt = vec3(0, 0, 0)
     q_wgt = vec3(0, 0, 0)
     w = len(mapping)*[None]
@@ -226,6 +319,23 @@ def affine_transform_3d(v, mapping, alpha = 1):
     return v_out
 
 def similarity_transform_2d(v, mapping, alpha = 1):
+    """Maps a point on the undeformed image to a point on the deformed image given a set of
+    points mapping points on the deformed image to points on the undeformed image using
+    similarity transformation. Used on two-dimensional images.
+    
+    Parameters
+    ----------
+    v: vector
+        A point on the undeformed image represented by a two-dimensional vector.
+    
+    mapping: list of tuples of vectors
+        A list of tuples containing a pair of vectors that represent points on the
+        undeformed image mapping to points on the deformed image.
+    
+    alpha: float, optional
+        Can affect where a point maps exactly on the deformed image and is set to 1 by
+        default if it is not specified.
+    """
     p_wgt = vec2(0, 0)
     q_wgt = vec2(0, 0)
     w = len(mapping)*[None]
@@ -259,6 +369,23 @@ def similarity_transform_2d(v, mapping, alpha = 1):
     return v_out
 
 def rigid_transform_2d(v, mapping, alpha = 1):
+    """Maps a point on the undeformed image to a point on the deformed image given a set of
+    points mapping points on the deformed image to points on the undeformed image using
+    rigid transformation. Used on two-dimensional images.
+    
+    Parameters
+    ----------
+    v: vector
+        A point on the undeformed image represented by a two-dimensional vector.
+    
+    mapping: list of tuples of vectors
+        A list of tuples containing a pair of vectors that represent points on the
+        undeformed image mapping to points on the deformed image.
+    
+    alpha: float, optional
+        Can affect where a point maps exactly on the deformed image and is set to 1 by
+        default if it is not specified.
+    """
     p_wgt = vec2(0, 0)
     q_wgt = vec2(0, 0)
     w = len(mapping)*[None]
@@ -292,6 +419,20 @@ def rigid_transform_2d(v, mapping, alpha = 1):
     return v_out
 
 def test_transform_2d(transform, alpha = 1):
+    """Used to test transformation functions that transform two-dimensional points. Affine
+    transformation should preserve translation, rotation, and scaling (uniform and
+    non-uniform). Similarity transformation should preserve translation, rotation, and
+    uniform scaling. Rigid transformation should preserve only translation and rotation.
+    
+    Parameters
+    ----------
+    transform: transformation function
+        Function tested for transforming points.
+    
+    alpha: float, optional
+        Can affect where a point maps exactly on the deformed image and is set to 1 by
+        default if it is not specified.
+    """
     points = 20*[None]
     for i in range(20):
         x = random.randrange(-40, 41)
@@ -351,6 +492,20 @@ def test_transform_2d(transform, alpha = 1):
     print()
 
 def test_transform_3d(transform, alpha = 1):
+    """Used to test transformation functions that transform three-dimensional points.
+    Affine transformation should preserve translation, rotation, and scaling (uniform and
+    non-uniform). Similarity transformation should preserve translation, rotation, and
+    uniform scaling. Rigid transformation should preserve only translation and rotation.
+    
+    Parameters
+    ----------
+    transform: transformation function
+        Function tested for transforming points.
+    
+    alpha: float, optional
+        Can affect where a point maps exactly on the deformed image and is set to 1 by
+        default if it is not specified.
+    """
     points = 20*[None]
     for i in range(20):
         x = random.randrange(-40, 41)
@@ -426,6 +581,10 @@ def test_transform_3d(transform, alpha = 1):
     print()
 
 def triangle(p1, p2, p3, width, height):
+    """Used to return a set of points within a triangle given three points defining the
+    triangle. This function is used by the graphical user interface to draw deformed images
+    by filling triangles defined by three transformed points.
+    """
     v1 = vec2(round(p1.x), round(p1.y))
     v2 = vec2(round(p2.x), round(p2.y))
     v3 = vec2(round(p3.x), round(p3.y))
@@ -497,9 +656,14 @@ def triangle(p1, p2, p3, width, height):
 from PIL import Image, ImageTk
 
 def transform_image(image, transform, mapping, alpha = 1, incr_x = 10, incr_y = 10):
+    """Used to transform an image. This function is used by the graphical user interface to
+    deform an image given a transformation and a list of points that mapping to another set
+    of points.
+    """
+    background = [255, 255, 255, 255]
     width, height = image.size
     image_in = np.array(image.convert("RGBA"))
-    image_out = [[[255, 255, 255, 255] for j in range(width)] for i in range(height)]
+    image_out = [[background[:] for j in range(width)] for i in range(height)]
     for i in range(0, height, incr_y):
         p_ur = transform(vec2(0, i), mapping, alpha)
         p_lr = transform(vec2(0, i + incr_y), mapping, alpha)
@@ -534,23 +698,41 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 
 class ImageTransform:
+    "Create the graphical user interface for deforming images."
     min_image_width = 400
     min_image_height = 250
     image = None
+    image_original = None
+    image_transformed = None
     fixed_label = None
     moving_label = None
     line = None
     r_point = 2
     def __init__(self, master):
+        "Initialize application."
         self.master = master
         self.master.title("Image Transformation")
         self.master.minsize(self.min_image_width + 20, self.min_image_height + 20)
         self.menubar = tk.Menu(self.master)
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
         self.filemenu.add_command(label="Load Image", command=self.load_image)
+        self.filemenu.add_command(label="Save Image", command=self.save_image)
         self.filemenu.add_separator()
         self.filemenu.add_command(label="Exit", command=self.master.destroy)
         self.menubar.add_cascade(label="File", menu=self.filemenu)
+        # Incomplete
+        # self.editmenu = tk.Menu(self.menubar, tearoff=0)
+        # self.editmenu.add_command(label="Undo", command=lambda: None)
+        # self.editmenu.add_command(label="Redo", command=lambda: None)
+        # self.editmenu.add_separator()
+        # self.editmenu.add_command(label="Copy", command=lambda: None)
+        # self.editmenu.add_command(label="Paste", command=lambda: None)
+        # self.menubar.add_cascade(label="Edit", menu=self.editmenu)
+        self.viewmenu = tk.Menu(self.menubar, tearoff=0)
+        self.viewmenu.add_command(label="Show/Hide Points", command=self.hide_mapping_toggle)
+        # Incomplete
+        # self.viewmenu.add_command(label="Show/Hide Grid", command=lambda: None)
+        self.menubar.add_cascade(label="View", menu=self.viewmenu)
         self.master.config(menu=self.menubar)
         self.main_frame = tk.Frame(self.master)
         self.main_frame.pack()
@@ -562,21 +744,21 @@ class ImageTransform:
         self.canvas.bind("<Leave>", self.hide_point)
         self.canvas.bind("<Motion>", self.render_point)
         self.canvas.pack()
-        self.radio_frame = tk.Frame(self.main_frame)
-        self.radio_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+        self.option_frame = tk.Frame(self.main_frame)
+        self.option_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
         self.hide = tk.IntVar(value=0)
-        self.toggle_hide = tk.Checkbutton(self.radio_frame, text="Hide points", variable=self.hide, command=self.hide_mapping)
+        self.toggle_hide = tk.Checkbutton(self.option_frame, text="Hide points", variable=self.hide, command=self.hide_mapping)
         self.toggle_hide.pack(side="right", anchor=tk.NE)
-        self.transform_label = tk.Label(self.radio_frame, text="Transformation")
+        self.transform_label = tk.Label(self.option_frame, text="Transformation")
         self.transform_label.pack(side="top", anchor=tk.NW)
         self.transform_option = tk.IntVar(value=0)
-        self.option_affine = tk.Radiobutton(self.radio_frame, text="Affine", variable=self.transform_option, value=1)
+        self.option_affine = tk.Radiobutton(self.option_frame, text="Affine", variable=self.transform_option, value=1)
         self.option_affine.pack(side="top", anchor=tk.NW)
-        self.option_similarity = tk.Radiobutton(self.radio_frame, text="Similarity", variable=self.transform_option, value=2)
+        self.option_similarity = tk.Radiobutton(self.option_frame, text="Similarity", variable=self.transform_option, value=2)
         self.option_similarity.pack(side="top", anchor=tk.NW)
-        self.option_rigid = tk.Radiobutton(self.radio_frame, text="Rigid", variable=self.transform_option, value=3)
+        self.option_rigid = tk.Radiobutton(self.option_frame, text="Rigid", variable=self.transform_option, value=3)
         self.option_rigid.pack(side="top", anchor=tk.NW)
-        self.alpha_frame = tk.Frame(self.radio_frame)
+        self.alpha_frame = tk.Frame(self.option_frame)
         self.alpha_frame.pack(side="top", anchor=tk.NW)
         self.alpha_label = tk.Label(self.alpha_frame, text="Alpha = ")
         self.alpha_label.pack(side="left")
@@ -584,17 +766,18 @@ class ImageTransform:
         self.alpha_entry.delete(0, tk.END)
         self.alpha_entry.insert(0, "1.0000")
         self.alpha_entry.pack(side="left")
-        self.transform_frame = tk.Frame(self.main_frame)
-        self.transform_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
-        self.transform = tk.Button(self.transform_frame, text="Transfrom Image", command=self.transform_input)
-        self.transform.pack(side="left")
-        self.view_original = tk.Button(self.transform_frame, text="View Original", command=self.show_original)
-        self.view_original.pack(side="left")
-        self.action_reset = tk.Button(self.transform_frame, text="Reset", command=self.reset)
+        self.action_frame = tk.Frame(self.main_frame)
+        self.action_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+        self.action_transform = tk.Button(self.action_frame, text="Transfrom Image", command=self.transform_input)
+        self.action_transform.pack(side="left")
+        self.action_view_original = tk.Button(self.action_frame, text="View Original", command=self.show_original)
+        self.action_view_original.pack(side="left")
+        self.action_reset = tk.Button(self.action_frame, text="Reset", command=self.reset)
         self.action_reset.pack(side="right")
         self.fixed = []
         self.moving = []
     def load_image(self):
+        "Open file dialog to select image to load."
         image_source = filedialog.askopenfilename(initialdir="/", title="Select File")
         if (image_source == ""): return
         try:
@@ -621,7 +804,16 @@ class ImageTransform:
         self.canvas.delete(tk.ALL)
         self.canvas.config(width=cwidth, height=cheight, bg=self.master.cget("background"))
         self.canvas.create_image((cwidth/2, cheight/2), image=self.image)
+    def save_image(self):
+        "Open file dialog to save image to file."
+        image_directory = filedialog.asksaveasfilename(initialdir="/", title="Save File")
+        if (image_directory == ""): return
+        try:
+            self.image_transformed.save(image_directory)
+        except Exception as err:
+            messagebox.showerror("Error", "Failed to save image.\n" + str(err))
     def show_original(self):
+        "Display original undeformed image."
         if (self.image is None):
             messagebox.showerror("Error", "No image was selected.")
             return
@@ -634,6 +826,7 @@ class ImageTransform:
         cheight = self.canvas.winfo_height()
         self.canvas.tag_lower(self.canvas.create_image((cwidth/2, cheight/2), image=self.image))
     def transform_input(self):
+        "Transform image given selected transformation and alpha value."
         if (self.image is None):
             messagebox.showerror("Error", "No image was selected.")
             return
@@ -660,6 +853,7 @@ class ImageTransform:
         cheight = self.canvas.winfo_height()
         self.canvas.tag_lower(self.canvas.create_image((cwidth/2, cheight/2), image=self.image))
     def hide_mapping(self):
+        "Hide points and connecting lines from canvas."
         if (self.hide.get() == 1):
             self.canvas.itemconfig("fixed", state=tk.HIDDEN)
             self.canvas.itemconfig("moving", state=tk.HIDDEN)
@@ -668,7 +862,12 @@ class ImageTransform:
             self.canvas.itemconfig("fixed", state=tk.NORMAL)
             self.canvas.itemconfig("moving", state=tk.NORMAL)
             self.canvas.itemconfig("line", state=tk.NORMAL)
+    def hide_mapping_toggle(self):
+        "Set variable that hides or shows points."
+        self.hide.set(1 - self.hide.get())
+        self.hide_mapping()
     def reset(self):
+        "Reset values, clear placed points, and show original undeformed image."
         self.fixed = []
         self.moving = []
         self.place_fixed_or_moving = 0
@@ -676,6 +875,7 @@ class ImageTransform:
         self.show_original()
     place_fixed_or_moving = 0
     def place_point(self, event):
+        "Place point on image after left mouse button is clicked on canvas."
         if (self.image is None or self.hide.get() == 1): return
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasy(event.y)
@@ -700,6 +900,7 @@ class ImageTransform:
             self.fixed_label = self.canvas.create_oval(x - self.r_point, y - self.r_point, x + self.r_point, y + self.r_point, fill="red", width=0, tags="fixed")
             self.place_fixed_or_moving = 0
     def show_point(self, event):
+        "Show point and connecting line on canvas when cursor enters canvas."
         if (self.image is None or self.hide.get() == 1): return
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasy(event.y)
@@ -709,6 +910,7 @@ class ImageTransform:
             self.moving_label = self.canvas.create_oval(x - self.r_point, y - self.r_point, x + self.r_point, y + self.r_point, fill="blue", width=0, tags="moving")
             self.line = self.canvas.create_line(self.fixed_x, self.fixed_y, x, y, fill="black", dash=(4, 4))
     def hide_point(self, event):
+        "Hide point following cursor and connecting line after cursor exits canvas."
         if (self.place_fixed_or_moving == 0):
             if (self.fixed_label is not None):
                 self.canvas.delete(self.fixed_label)
@@ -718,6 +920,7 @@ class ImageTransform:
             if (self.line is not None):
                 self.canvas.delete(self.line)
     def render_point(self, event):
+        "Redraw point and connecting line when cursor moves within canvas."
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasy(event.y)
         if (self.place_fixed_or_moving == 0):
@@ -729,6 +932,10 @@ class ImageTransform:
                 self.canvas.coords(self.line, self.fixed_x, self.fixed_y, x, y)
 
 def open_gui():
+    "Open application for deforming images using MLS."
     root = tk.Tk()
     app = ImageTransform(root)
     app.master.mainloop()
+
+if (__name__ == "__main__"):
+    open_gui()
