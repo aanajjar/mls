@@ -3,9 +3,9 @@ import random
 import numpy as np
 
 class vec2:
-    "Represent vector of two elements."
+    "Represent two-dimensional vector."
     def __init__(self, x, y):
-        "Initialize self."
+        "Initialize vector."
         self.x = x
         self.y = y
     def __add__(self, other):
@@ -48,11 +48,11 @@ class vec2:
         "Multiply column vector by row vector."
         return mat2([self.x*other.x, self.x*other.y, self.y*other.x, self.y*other.y])
     def str_repr(self, ndigits):
-        "Represents vector as string given the number of digits to round each element."
+        "Represent vector as string given the number of digits to round each element."
         return "(" + str(round(self.x, ndigits)) + ", " + str(round(self.y, ndigits)) + ")"
 
 class vec3:
-    "Represent vector of three elements."
+    "Represent three-dimensional vector."
     def __init__(self, x, y, z):
         "Initialize vector."
         self.x = x
@@ -107,20 +107,20 @@ class vec3:
         self.z*other.x, self.z*other.y, self.z*other.z]
         return mat3(value)
     def str_repr(self, ndigits):
-        "Represents vector as string given the number of digits to round each element."
+        "Represent vector as string given the number of digits to round each element."
         return "(" + str(round(self.x, ndigits)) + ", " + str(round(self.y, ndigits)) + ", " + str(round(self.z, ndigits)) + ")"
 
 class mat2:
     "Represent two-by-two matrix."
     def __init__(self, value = None):
         "Initialize matrix."
-        if (value != None):
+        if (value is not None):
             if (isinstance(value, float)):
                 self.matrix = [value, 0.0, 0.0, value]
             elif (isinstance(value, int)):
                 self.matrix = [value, 0, 0, value]
             elif (isinstance(value, list)):
-                self.matrix = value
+                self.matrix = value.copy()
         else:
             self.matrix = [0.0, 0.0, 0.0, 0.0]
     def __getitem__(self, index):
@@ -136,13 +136,13 @@ class mat2:
         "Multiply matrix by a scalar value, vector, or another matrix."
         if (isinstance(other, float) or isinstance(other, int)):
             return mat2([self[0]*other, self[1]*other, self[2]*other, self[3]*other])
-        if (isinstance(other, mat2)):
+        elif (isinstance(other, mat2)):
             return mat2([self[0]*other[0] + self[1]*other[2], self[0]*other[1] + self[1]*other[3], self[2]*other[0] + self[3]*other[2], self[2]*other[1] + self[3]*other[3]])
-        if (isinstance(other, vec2)):
+        elif (isinstance(other, vec2)):
             return vec2(self[0]*other.x + self[1]*other.y, self[2]*other.x + self[3]*other.y)
     def __rmul__(self, k):
         "Multiply matrix by scalar value."
-        return mat2([self[0]*k, self[1]*k, self[2]*k, self[3]*k])
+        return mat2([k*self[0], k*self[1], k*self[2], k*self[3]])
     def __truediv__(self, k):
         "Divide matrix by scalar value."
         return mat2([self[0]/k, self[1]/k, self[2]/k, self[3]/k])
@@ -164,13 +164,13 @@ class mat3:
     "Represent three-by-three matrix."
     def __init__(self, value = None):
         "Initialize matrix."
-        if (value != None):
+        if (value is not None):
             if (isinstance(value, float)):
                 self.matrix = [value, 0.0, 0.0, 0.0, value, 0.0, 0.0, 0.0, value]
             elif (isinstance(value, int)):
                 self.matrix = [value, 0, 0, 0, value, 0, 0, 0, value]
             elif (isinstance(value, list)):
-                self.matrix = value
+                self.matrix = value.copy()
         else:
             self.matrix = [0.0 for i in range(9)]
     def __getitem__(self, index):
@@ -189,15 +189,15 @@ class mat3:
         if (isinstance(other, float) or isinstance(other, int)):
             value = [self[i]*other for i in range(9)]
             return mat3(value)
-        if (isinstance(other, mat3)):
+        elif (isinstance(other, mat3)):
             value = [self[i]*other[j] + self[i + 1]*other[j + 3] + self[i + 2]*other[j + 6] for i in range(0, 9, 3) for j in range(3)]
             return mat3(value)
-        if (isinstance(other, vec3)):
+        elif (isinstance(other, vec3)):
             value = [self[i]*other.x + self[i + 1]*other.y + self[i + 2]*other.z for i in range(0, 9, 3)]
             return vec3(*value)
     def __rmul__(self, k):
         "Multiply matrix by scalar value."
-        value = [self[i]*k for i in range(9)]
+        value = [k*self[i] for i in range(9)]
         return mat3(value)
     def __truediv__(self, k):
         "Divide matrix by scalar value."
@@ -225,7 +225,7 @@ class mat3:
 
 def affine_transform_2d(v, mapping, alpha = 1):
     """Maps a point on the undeformed image to a point on the deformed image given a set of
-    points mapping points on the deformed image to points on the undeformed image using
+    points mapping points on the undeformed image to points on the deformed image using
     affine transformation. Used on two-dimensional images.
     
     Parameters
@@ -272,7 +272,7 @@ def affine_transform_2d(v, mapping, alpha = 1):
 
 def affine_transform_3d(v, mapping, alpha = 1):
     """Maps a point on the undeformed image to a point on the deformed image given a set of
-    points mapping points on the deformed image to points on the undeformed image using
+    points mapping points on the undeformed image to points on the deformed image using
     affine transformation. Used on three-dimensional images.
     
     Parameters
@@ -320,7 +320,7 @@ def affine_transform_3d(v, mapping, alpha = 1):
 
 def similarity_transform_2d(v, mapping, alpha = 1):
     """Maps a point on the undeformed image to a point on the deformed image given a set of
-    points mapping points on the deformed image to points on the undeformed image using
+    points mapping points on the undeformed image to points on the deformed image using
     similarity transformation. Used on two-dimensional images.
     
     Parameters
@@ -368,9 +368,59 @@ def similarity_transform_2d(v, mapping, alpha = 1):
     v_out += q_wgt
     return v_out
 
+def similarity_transform_3d(v, mapping, alpha = 1):
+    """Maps a point on the undeformed image to a point on the deformed image given a set of
+    points mapping points on the undeformed image to points on the deformed image using
+    similarity transformation. Used on three-dimensional images.
+    
+    Parameters
+    ----------
+    v: vector
+        A point on the undeformed image represented by a three-dimensional vector.
+    
+    mapping: list of tuples of vectors
+        A list of tuples containing a pair of vectors that represent points on the
+        undeformed image mapping to points on the deformed image.
+    
+    alpha: float, optional
+        Can affect where a point maps exactly on the deformed image and is set to 1 by
+        default if it is not specified.
+    """
+    p_wgt = vec3(0, 0, 0)
+    q_wgt = vec3(0, 0, 0)
+    w = len(mapping)*[None]
+    w_sum = 0
+    for i in range(len(mapping)):
+        mp = mapping[i]
+        x = mp[0].x - v.x
+        y = mp[0].y - v.y
+        z = mp[0].z - v.z
+        if (x == 0 and y == 0 and z == 0): return mp[1]
+        w[i] = 1/((x*x + y*y + z*z) ** alpha)
+        p_wgt += mp[0]*w[i]
+        q_wgt += mp[1]*w[i]
+        w_sum += w[i]
+    p_wgt /= w_sum
+    q_wgt /= w_sum
+    A = mat3(0)
+    k = 0
+    for i in range(len(mapping)):
+        mp = mapping[i]
+        p_adj = mp[0] - p_wgt
+        q_adj = mp[1] - q_wgt
+        A += w[i]*p_adj.transpose_multiply(q_adj)
+        k += w[i]*p_adj.dot(p_adj)
+    A_arr = np.array(A.matrix).reshape(3, 3)
+    U, S, V = np.linalg.svd(A_arr)
+    M_arr = np.matmul(np.transpose(V), np.transpose(U))
+    M = mat3(M_arr.ravel().tolist())
+    k = np.sum(S)/k
+    v_out = k*M*(v - p_wgt) + q_wgt
+    return v_out
+
 def rigid_transform_2d(v, mapping, alpha = 1):
     """Maps a point on the undeformed image to a point on the deformed image given a set of
-    points mapping points on the deformed image to points on the undeformed image using
+    points mapping points on the undeformed image to points on the deformed image using
     rigid transformation. Used on two-dimensional images.
     
     Parameters
@@ -416,6 +466,53 @@ def rigid_transform_2d(v, mapping, alpha = 1):
     r = math.sqrt(v_sub.dot(v_sub))
     v_out *= r
     v_out += q_wgt
+    return v_out
+
+def rigid_transform_3d(v, mapping, alpha = 1):
+    """Maps a point on the undeformed image to a point on the deformed image given a set of
+    points mapping points on the undeformed image to points on the deformed image using
+    rigid transformation. Used on three-dimensional images.
+    
+    Parameters
+    ----------
+    v: vector
+        A point on the undeformed image represented by a three-dimensional vector.
+    
+    mapping: list of tuples of vectors
+        A list of tuples containing a pair of vectors that represent points on the
+        undeformed image mapping to points on the deformed image.
+    
+    alpha: float, optional
+        Can affect where a point maps exactly on the deformed image and is set to 1 by
+        default if it is not specified.
+    """
+    p_wgt = vec3(0, 0, 0)
+    q_wgt = vec3(0, 0, 0)
+    w = len(mapping)*[None]
+    w_sum = 0
+    for i in range(len(mapping)):
+        mp = mapping[i]
+        x = mp[0].x - v.x
+        y = mp[0].y - v.y
+        z = mp[0].z - v.z
+        if (x == 0 and y == 0 and z == 0): return mp[1]
+        w[i] = 1/((x*x + y*y + z*z) ** alpha)
+        p_wgt += mp[0]*w[i]
+        q_wgt += mp[1]*w[i]
+        w_sum += w[i]
+    p_wgt /= w_sum
+    q_wgt /= w_sum
+    A = mat3(0)
+    for i in range(len(mapping)):
+        mp = mapping[i]
+        p_adj = mp[0] - p_wgt
+        q_adj = mp[1] - q_wgt
+        A += w[i]*p_adj.transpose_multiply(q_adj)
+    A_arr = np.array(A.matrix).reshape(3, 3)
+    U, S, V = np.linalg.svd(A_arr)
+    M_arr = np.matmul(np.transpose(V), np.transpose(U))
+    M = mat3(M_arr.ravel().tolist())
+    v_out = M*(v - p_wgt) + q_wgt
     return v_out
 
 def test_transform_2d(transform, alpha = 1):
@@ -657,21 +754,24 @@ from PIL import Image, ImageTk
 
 def transform_image(image, transform, mapping, alpha = 1, incr_x = 10, incr_y = 10):
     """Used to transform an image. This function is used by the graphical user interface to
-    deform an image given a transformation and a list of points that mapping to another set
-    of points.
+    deform an image given a transformation and a list of points that map to another set of
+    points.
     """
-    background = [255, 255, 255, 255]
+    background = [255, 255, 255, 0]
     width, height = image.size
     image_in = np.array(image.convert("RGBA"))
     image_out = [[background[:] for j in range(width)] for i in range(height)]
-    for i in range(0, height, incr_y):
-        p_ur = transform(vec2(0, i), mapping, alpha)
-        p_lr = transform(vec2(0, i + incr_y), mapping, alpha)
-        for j in range(incr_x, width, incr_x):
+    transform_row = []
+    for i in range(0, width + incr_x, incr_x):
+        transform_row.append(transform(vec2(i, 0), mapping, alpha))
+    for i in range(incr_y, height + incr_y, incr_y):
+        p_ur = transform_row[0]
+        p_lr = transform_row[0] = transform(vec2(0, i), mapping, alpha)
+        for j in range(incr_x, width + incr_x, incr_x):
             p_ul = p_ur
             p_ll = p_lr
-            p_ur = transform(vec2(j, i), mapping, alpha)
-            p_lr = transform(vec2(j, i + incr_y), mapping, alpha)
+            p_ur = transform_row[j//incr_x]
+            p_lr = transform_row[j//incr_x] = transform(vec2(j, i), mapping, alpha)
             a = p_ur - p_ul
             b = p_ll - p_ul
             det = a.x*b.y - a.y*b.x
@@ -680,7 +780,7 @@ def transform_image(image, transform, mapping, alpha = 1, incr_x = 10, incr_y = 
                     c = p - p_ul
                     rx = (b.y*c.x - b.x*c.y)/det
                     ry = (a.x*c.y - a.y*c.x)/det
-                    image_out[p.y][p.x] = image_in[min(height - 1, max(0, round(i + ry*incr_y)))][min(width - 1, max(0, round(j + (rx - 1)*incr_x)))]
+                    image_out[p.y][p.x] = image_in[min(height - 1, max(0, round(i + (ry - 1)*incr_y)))][min(width - 1, max(0, round(j + (rx - 1)*incr_x)))]
             a = p_lr - p_ll
             b = p_lr - p_ur
             det = a.x*b.y - a.y*b.x
@@ -690,7 +790,7 @@ def transform_image(image, transform, mapping, alpha = 1, incr_x = 10, incr_y = 
                     c = p - p_ulr
                     rx = (b.y*c.x - b.x*c.y)/det
                     ry = (a.x*c.y - a.y*c.x)/det
-                    image_out[p.y][p.x] = image_in[min(height - 1, max(0, round(i + ry*incr_y)))][min(width - 1, max(0, round(j + (rx - 1)*incr_x)))]
+                    image_out[p.y][p.x] = image_in[min(height - 1, max(0, round(i + (ry - 1)*incr_y)))][min(width - 1, max(0, round(j + (rx - 1)*incr_x)))]
     image_out = Image.fromarray(np.uint8(image_out))
     return image_out
 
